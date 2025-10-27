@@ -10,6 +10,7 @@ import torch.backends.cudnn as cudnn
 import sys
 import os
 import time
+import numbers
 from datetime import datetime
 
 import models
@@ -19,6 +20,7 @@ from lib import protocols
 from lib.non_parametric_classifier import NonParametricClassifier
 from lib.criterion import Criterion
 from lib.ans_discovery import ANsDiscovery
+from lib.auto_k import AutoKHead
 from lib.utils import AverageMeter, time_progress, adjust_learning_rate
 
 from packages import session
@@ -85,6 +87,25 @@ def main():
     npc = NonParametricClassifier(cfg.low_dim, ntrain, cfg.npc_temperature, cfg.npc_momentum)
     ANs_discovery = ANsDiscovery(ntrain)
     criterion = Criterion()
+    auto_k_head = None
+    if cfg.auto_k_enable:
+        auto_k_head = AutoKHead(
+            min_k=cfg.auto_k_min_k,
+            max_k=cfg.auto_k_max_k,
+            method=cfg.auto_k_method,
+            method_cycle=cfg.auto_k_method_cycle,
+            cycle_level=cfg.auto_k_cycle_level,
+            consensus_methods=(cfg.auto_k_consensus_methods if cfg.auto_k_consensus_methods else None),
+            sample_size=cfg.auto_k_sample_size,
+            dp_lambda=cfg.auto_k_dp_lambda,
+            dp_max_iter=cfg.auto_k_dp_max_iter,
+            eigengap_neighbors=cfg.auto_k_eigengap_neighbors,
+            xmeans_bic_threshold=cfg.auto_k_xmeans_bic_threshold,
+            max_depth=cfg.auto_k_max_depth,
+            gmeans_threshold=cfg.auto_k_gmeans_threshold,
+            log_embeddings=cfg.auto_k_log_embeddings,
+            random_state=cfg.seed,
+        )
     optimizer = optimizers.get(cfg.optimizer, instant=True, params=net.parameters())
     lr_handler = lr_policy.get(cfg.lr_policy, instant=True)
     protocol = protocols.get(cfg.protocol)
@@ -162,6 +183,42 @@ def main():
 
             train(round, epoch, net, trainloader, optimizer, npc, criterion,
                 ANs_discovery, lr, writer)
+
+            if auto_k_head:
+                est_k, auto_info = auto_k_head.estimate(
+                    npc.memory, round_idx=round, epoch_idx=epoch)
+                method_name = auto_info.get('method', cfg.auto_k_method)
+                writer.add_scalar('AutoK/EstimatedK', est_k, epoch)
+                global_writer.add_scalar('AutoK/EstimatedK', est_k,
+                                         round * cfg.max_epoch + epoch)
+                writer.add_text('AutoK/Method', method_name, epoch)
+                votes = auto_info.get('votes')
+                if isinstance(votes, dict):
+                    for vote_method, vote_value in votes.items():
+                        writer.add_scalar(f'AutoK/Vote_{vote_method}', vote_value, epoch)
+                for key, value in auto_info.items():
+                    if key in {'assignments', 'features', 'indices', 'method',
+                               'votes', 'centers'}:
+                        continue
+                    if isinstance(value, numbers.Number):
+                        writer.add_scalar(f'AutoK/{method_name}_{key}', value, epoch)
+                if (auto_k_head.log_embeddings and
+                        auto_info.get('assignments') is not None and
+                        auto_info.get('features') is not None):
+                    try:
+                        features_np = auto_info['features']
+                        assignments_np = auto_info['assignments']
+                        max_points = min(features_np.shape[0], 1024)
+                        embedding = torch.from_numpy(features_np[:max_points]).float()
+                        metadata = [str(x) for x in assignments_np[:max_points]]
+                        writer.add_embedding(
+                            embedding,
+                            metadata=metadata,
+                            global_step=epoch,
+                            tag=f'AutoK/{method_name}_embeddings'
+                        )
+                    except Exception as err:
+                        logger.debug('Failed to log Auto-K embeddings: %s', err)
 
             logger.info('Start to evaluate...')
             acc = protocol(net, npc, trainloader, testloader, 200,

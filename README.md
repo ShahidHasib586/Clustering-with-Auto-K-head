@@ -82,16 +82,38 @@ pip install numpy scipy scikit-learn scikit-image pillow matplotlib \
 
    All overrides are logged to `sessions/<timestamp>/config.yaml` for future reference.
 
-6. Visualise clustering progress live in TensorBoard by enabling TensorBoard logging (already `True` in `configs/base.yaml`) and running:
+6. **Enable the Auto-K head:** turn on automatic cluster-count estimation by adding `--auto-k-enable` to your training command. The default `consensus` strategy combines multiple heuristics and writes its vote to TensorBoard:
+
+   ```bash
+   python3 main.py --cfgs configs/base.yaml configs/cifar10.yaml \
+       --auto-k-enable --auto-k-method consensus --log-tfb
+   ```
+
+   Key Auto-K switches:
+
+   | Option | Purpose |
+   | --- | --- |
+   | `--auto-k-method {consensus,silhouette,eigengap,dpmeans,xmeans,gmeans}` | Pick a single heuristic for the whole run. |
+   | `--auto-k-method-cycle consensus,silhouette,xmeans` | Cycle through a comma-separated list of heuristics. Combine with `--auto-k-cycle-level {round,epoch}` to change cadence. |
+   | `--auto-k-consensus-methods silhouette,dpmeans` | Restrict the voters used by the consensus strategy. |
+   | `--auto-k-min-k` / `--auto-k-max-k` | Clamp the admissible cluster-count range. |
+   | `--auto-k-dp-lambda` and `--auto-k-dp-max-iter` | Tune the DP-means penalty and refinement steps. |
+   | `--auto-k-xmeans-bic-threshold`, `--auto-k-max-depth`, `--auto-k-gmeans-threshold` | Control the behaviour of the X-means and G-means inspired splits. |
+   | `--auto-k-sample-size` | Limit the number of embeddings analysed per estimation pass (defaults to 2048). |
+   | `--auto-k-log-embeddings` | Store the sampled embeddings and their pseudo labels in TensorBoard under `AutoK/*_embeddings`. |
+
+   You can switch heuristics on the fly by pairing the cycling options with curriculum rounds. For example, `--auto-k-method-cycle silhouette,dpmeans,consensus --auto-k-cycle-level round` evaluates each round with a different estimator while keeping TensorBoard logs aligned.
+
+7. Visualise clustering progress live in TensorBoard by enabling TensorBoard logging (already `True` in `configs/base.yaml`) and running:
 
    ```bash
    # in a separate terminal
    tensorboard --logdir sessions --port 6006
    ```
 
-   Visit `http://localhost:6006` to monitor metrics such as AN statistics, loss curves, and evaluation accuracy while training is running.
+   Visit `http://localhost:6006` to monitor metrics such as AN statistics, loss curves, evaluation accuracy, and the new `AutoK/EstimatedK`, `AutoK/Vote_*`, and `AutoK/<method>_*` traces. When `--auto-k-log-embeddings` is enabled, TensorBoard’s **Projector** tab visualises the sampled embeddings colour-coded by the inferred cluster labels.
 
-7. Run on CUDA with manual setup (optional): if you have multiple CUDA toolkits installed, you can control visibility by prefixing the command: `CUDA_VISIBLE_DEVICES=0 python3 main.py ...`. Combine this with `--gpus 0` to ensure PyTorch only initialises the desired devices.
+8. Run on CUDA with manual setup (optional): if you have multiple CUDA toolkits installed, you can control visibility by prefixing the command: `CUDA_VISIBLE_DEVICES=0 python3 main.py ...`. Combine this with `--gpus 0` to ensure PyTorch only initialises the desired devices.
 
 Every time the `main.py` is run, a new session will be started with the name of current timestamp and all the related files will be stored in folder `sessions/timestamp/` including checkpoints, logs, etc.
 
