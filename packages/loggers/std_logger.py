@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # @Date    : 2018-11-11 15:08:06
 # @Author  : Raymond Wong (jiabo.huang@qmul.ac.uk)
@@ -128,7 +128,7 @@ class STDLogger:
 
     @staticmethod
     def erase_lines(n=1):
-        for _ in xrange(n):
+        for _ in range(n):
             sys.stdout.write('\x1b[1A')
             sys.stdout.write('\x1b[2K')
         sys.stdout.flush()
@@ -146,7 +146,7 @@ class STDLogger:
     @staticmethod
     def progress(current, total, msg='processing %d/%d item...'):
         STDLogger.erase()
-        print msg % (current, total)
+        print(msg % (current, total))
         STDLogger.go_up()
 
 from ..register import REGISTER

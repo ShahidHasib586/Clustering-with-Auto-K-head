@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # @Date    : 2019-01-25 14:58:24
 # @Author  : Raymond Wong (jiabo.huang@qmul.ac.uk)
@@ -9,7 +9,7 @@ from ..loggers.std_logger import STDLogger as logger
 from ..utils import tuple_or_list, get_valid_size
 from ..config import CONFIG as cfg
 
-import transforms as custom_transforms
+from . import transforms as custom_transforms
 import torchvision.transforms as transforms
 
 def require_args():

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # @Date    : 2019-01-24 22:16:37
 # @Author  : Raymond Wong (jiabo.huang@qmul.ac.uk)
@@ -54,7 +54,8 @@ class _META_(type):
 
         for file in files:
             assert os.path.exists(file), "Config file not found: [%s]" % file
-            configs = yaml.load(open(file, 'r'))
+            with open(file, 'r') as handle:
+                configs = yaml.safe_load(handle) or {}
             _META_.PARSER.set_defaults(**configs)
 
     def get(self, attr, default=None):
@@ -63,7 +64,7 @@ class _META_(type):
         return default
 
     def yaml(self):
-        config = {k:v for k,v in sorted(vars(_META_.ARGS).items())}
+        config = {k: v for k, v in sorted(vars(_META_.ARGS).items())}
         return yaml.safe_dump(config, default_flow_style=False)
 
     def __getattr__(self, attr):
@@ -72,7 +73,7 @@ class _META_(type):
         except AttributeError:
             return _META_.ARGS.__getattribute__(attr)
         except:
-            traceback.print_exec()
+            traceback.print_exc()
             exit(-1)
 
     def __str__(self):
@@ -87,5 +88,5 @@ class _META_(type):
             table.add_row([i, k, v[:MAX_WIDTH] + ('...' if len(v) > MAX_WIDTH else ''), default])
         return table.get_string()
 
-class CONFIG(object):
-    __metaclass__ = _META_
+class CONFIG(object, metaclass=_META_):
+    pass

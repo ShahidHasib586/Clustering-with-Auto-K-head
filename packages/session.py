@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # @Date    : 2019-01-27 09:38:53
 # @Author  : Raymond Wong (jiabo.huang@qmul.ac.uk)
@@ -11,9 +11,9 @@ import torch
 import importlib
 import numpy as np
 
-from loggers.std_logger import STDLogger as logger
-from register import REGISTER
-from config import CONFIG as cfg
+from .loggers.std_logger import STDLogger as logger
+from .register import REGISTER
+from .config import CONFIG as cfg
 
 REGISTER.set_package(__name__)
 
@@ -66,7 +66,7 @@ def setup():
 
     # print args
     if not cfg.brief:
-        print cfg
+        print(cfg)
     # exit if require to print args only
     if cfg.print_args:
         exit(0)

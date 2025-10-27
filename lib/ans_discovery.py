@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # @Date    : 2018-10-12 21:37:13
 # @Author  : Raymond Wong (jiabo.huang@qmul.ac.uk)
@@ -97,11 +97,12 @@ class ANsDiscovery(nn.Module):
             features = npc.memory
 
             logger.debug('Start to compute each sample\'s entropy')
-            for start in xrange(0, self.samples_num, batch_size):
-                logger.progress(start, self.samples_num, 'processing %d/%d samples...')
+            samples_num = int(self.samples_num.item())
+            for start in range(0, samples_num, batch_size):
+                logger.progress(start, samples_num, 'processing %d/%d samples...')
 
                 end = start + batch_size
-                end = min(end, self.samples_num)
+                end = min(end, samples_num)
 
                 preds = F.softmax(npc(features[start:end], None), 1)
                 self.entropy[start:end] = -(preds * preds.log()).sum(1)
@@ -134,8 +135,8 @@ class ANsDiscovery(nn.Module):
             logger.debug('Start to get the position of both anchor and '
                           'instance samples')
             instance_cnt = 0
-            for i in xrange(self.samples_num):
-                logger.progress(i, self.samples_num, 'processing %d/%d samples...')
+            for i in range(samples_num):
+                logger.progress(i, samples_num, 'processing %d/%d samples...')
 
                 # for anchor samples
                 if (i == self.anchor_indexes).any():
@@ -150,7 +151,7 @@ class ANsDiscovery(nn.Module):
             anchor_features = features.index_select(0, self.anchor_indexes)
             self.neighbours = (torch.LongTensor(ANs_num, self.ANs_size)
                                                             .to(cfg.device))
-            for start in xrange(0, ANs_num, batch_size):
+            for start in range(0, ANs_num, batch_size):
                 logger.progress(start, ANs_num, 'processing %d/%d samples...')
 
                 end = start + batch_size
