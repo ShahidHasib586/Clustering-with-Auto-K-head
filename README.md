@@ -60,6 +60,22 @@ source .venv/bin/activate
 pip install -U pip wheel
 pip install -r requirements.txt
 
+micromamba activate and310
+
+#Torch + TorchVision (GPU CUDA 11.3 for P100). If no NVIDIA driver, use the CPU block below instead.
+pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 torchaudio==0.12.1+cu113 \
+  -f https://download.pytorch.org/whl/torch_stable.html
+
+# (If you don’t have a working NVIDIA driver: use CPU wheels)
+# pip install torch==1.12.1+cpu torchvision==0.13.1+cpu torchaudio==0.12.1+cpu \
+#   -f https://download.pytorch.org/whl/torch_stable.html
+
+# Align the NumPy/SciPy stack to pre-NumPy-2 era
+pip install --upgrade --no-deps numpy==1.23.5
+pip install --upgrade scipy==1.10.1 scikit-learn==1.1.3 scikit-image==0.19.3 matplotlib==3.5.3 Pillow==9.5.0
+
+pip install jinja2 typeguard
+
 # create the environment described in requirements.yaml
 #conda env create -f requirements.yaml
 #conda activate and-env
