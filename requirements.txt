@@ -7,6 +7,11 @@ matplotlib
 PyYAML
 prettytable
 tensorboardX
-torch==1.10.2
-torchvision==0.11.3
+# PyTorch 2.4+ is the first release series that provides wheels for Python 3.12.
+# We keep an upper bound to avoid future breaking changes until the codebase is
+# validated with newer major releases.
+torch>=2.4.0,<2.6
+# TorchVision must track the PyTorch release series. The 0.19 wheels pair with
+# PyTorch 2.4 and remain compatible with 2.5.
+torchvision>=0.19.0,<0.21
 faiss-cpu==1.7.4

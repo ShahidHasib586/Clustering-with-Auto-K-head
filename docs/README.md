@@ -24,15 +24,17 @@ The proposed AND model was evaluated on four object image classification dataset
 ## Reproduction
 
 ### Requirements
-Python 2.7 and Pytorch 1.0 are required. Please refer to `/path/to/AND/requirements.yaml` for other necessary modules. Conda environment we used for the experiments can also be rebuilt according to it.
+Python 3.10 or newer together with PyTorch 2.4 (or a later tested 2.x release) are required. Please refer to `/path/to/AND/requirements.yaml` for the full dependency list. The Conda environment we used for the experiments can also be rebuilt according to it.
 
 ### Usages
 
-1. Clone this repo: `git clone https://github.com/Raymond-sci/AND.git`
-2. Download datasets and store them in `/path/to/AND/data`. (Soft link is recommended to avoid redundant copies of datasets)
-2. To reproduce our reported result of ResNet18 on CIFAR10, please use the following command:`python main.py --cfgs configs/base.yaml configs/cifar10.yaml`
-3. Running on GPUs: code will be run on CPU by default, use this flag to specify the gpu devices which you want to use
-4. To evaluate trained models, use `--resume` to set the path of the generated checkpoint file and use `--test-only` flag to exit the program after evaluation
+1. Clone this repo: `git clone https://github.com/ShahidHasib586/Clustering-with-Auto-K-head.git`
+   and change into it with `cd Clustering-with-Auto-K-head`.
+2. (Optional) Create a virtual environment and install the Python dependencies: `python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt`.
+3. Download datasets and store them in `/path/to/AND/data`. (Soft link is recommended to avoid redundant copies of datasets)
+4. To reproduce our reported result of ResNet18 on CIFAR10, please use the following command:`python main.py --cfgs configs/base.yaml configs/cifar10.yaml`
+5. Running on GPUs: code will be run on CPU by default, use this flag to specify the gpu devices which you want to use
+6. To evaluate trained models, use `--resume` to set the path of the generated checkpoint file and use `--test-only` flag to exit the program after evaluation
 
 Every time the `main.py` is run, a new session will be started with the name of current timestamp and all the related files will be stored in folder `sessions/timestamp/` including checkpoints, logs, etc.
 

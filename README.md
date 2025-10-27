@@ -20,7 +20,7 @@ The proposed AND model was evaluated on four object image classification dataset
 
 ### Requirements
 
-Python 3.9 and PyTorch 1.10 are required. Please refer to `requirements.yaml` for the full Conda environment specification. The Conda environment we used for the experiments can also be rebuilt according to it.
+Python 3.10 or newer and PyTorch 2.4 (or any later 2.x release tested against this project) are required. Please refer to `requirements.yaml` for the full Conda environment specification. The Conda environment we used for the experiments can also be rebuilt according to it.
 
 #### Install with Conda (recommended)
 
@@ -45,7 +45,7 @@ pip install -r requirements.txt
 python3 -m venv .venv
 source .venv/bin/activate
 pip install --upgrade pip
-pip install torch==1.10.2 torchvision==0.11.3
+pip install "torch>=2.4.0,<2.6" "torchvision>=0.19.0,<0.21"
 pip install numpy scipy scikit-learn scikit-image pillow matplotlib \
     pyyaml prettytable tensorboard tensorboardx faiss-cpu==1.7.4
 ```
