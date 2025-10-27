@@ -27,7 +27,7 @@ Python 3.9 and PyTorch 1.10 are required. Please refer to `requirements.yaml` fo
 ```bash
 # clone the repository
 git clone https://github.com/ShahidHasib586/Clustering-with-Auto-K-head.git
-cd AND
+cd Clustering-with-Auto-K-head
 # use plain venv
 python3 -m venv .venv
 source .venv/bin/activate
