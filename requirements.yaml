@@ -3,7 +3,7 @@ channels:
   - pytorch
   - conda-forge
 dependencies:
-  - python=3.9
+  - python=3.10
   - pip
   - numpy
   - scipy
@@ -14,8 +14,8 @@ dependencies:
   - pyyaml
   - prettytable
   - tensorboardx
-  - pytorch=1.10.2
-  - torchvision=0.11.3
+  - pytorch=2.4.*
+  - torchvision=0.19.*
   - cpuonly
   - pip:
       - faiss-cpu==1.7.4
