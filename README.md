@@ -22,13 +22,76 @@ The proposed AND model was evaluated on four object image classification dataset
 
 Python 3.9 and PyTorch 1.10 are required. Please refer to `requirements.yaml` for the full Conda environment specification. The Conda environment we used for the experiments can also be rebuilt according to it.
 
-### Usages
+#### Install with Conda (recommended)
 
-1. Clone this repo: `git clone https://github.com/Raymond-sci/AND.git`
-2. Download datasets and store them in `/path/to/AND/data`. (Soft link is recommended to avoid redundant copies of datasets)
-3. To reproduce our reported result of ResNet18 on CIFAR10, please use the following command: `python3 main.py --cfgs configs/base.yaml configs/cifar10.yaml`
-4. Running on GPUs: code will be run on CPU by default; use the `--gpus` flag to specify the GPU devices that you want to use
-5. To evaluate trained models, use `--resume` to set the path of the generated checkpoint file and use `--test-only` flag to exit the program after evaluation
+```bash
+# clone the repository
+git clone https://github.com/Raymond-sci/AND.git
+cd AND
+
+# create the environment described in requirements.yaml
+conda env create -f requirements.yaml
+conda activate and-env
+```
+
+#### Install with pip (minimal)
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install --upgrade pip
+pip install torch==1.10.2 torchvision==0.11.3
+pip install numpy scipy scikit-learn scikit-image pillow matplotlib \
+    pyyaml prettytable tensorboard tensorboardx faiss-cpu==1.7.4
+```
+
+> **CUDA users:** replace the `cpuonly` dependency in `requirements.yaml` with `pytorch-cuda=<cuda_version>` (e.g. `pytorch-cuda=11.8`) and install the matching `faiss-gpu` wheel (`pip install faiss-gpu==1.7.4`).
+
+### Usage
+
+1. Download datasets and store them in `/path/to/AND/data`. (Soft link is recommended to avoid redundant copies of datasets.) For example, if your CIFAR-10 archive already exists at `/datasets/cifar10`, you can link it into the expected location:
+
+   ```bash
+   mkdir -p data
+   ln -s /datasets/cifar10 data/cifar10
+   ```
+2. Launch training via the session runner to automatically manage checkpoints and logs:
+
+   ```bash
+   python3 main.py --cfgs configs/base.yaml configs/cifar10.yaml \
+       --sess-dir sessions --dataset cifar10 --network resnet18
+   ```
+
+   This command reproduces the reported ResNet18 result on CIFAR10. Checkpoints, TensorBoard logs and configuration snapshots are written under `sessions/<timestamp>/`.
+
+3. To evaluate a saved checkpoint without further training, point `--resume` to the checkpoint path and add `--test-only`:
+
+   ```bash
+   python3 main.py --cfgs configs/base.yaml configs/cifar10.yaml \
+       --resume sessions/<timestamp>/checkpoint/0000-XXXXX.ckpt --test-only
+   ```
+
+4. Running on GPUs: the code selects CUDA automatically when available. Use `--gpus` to pick devices explicitly, e.g. `--gpus 0` or `--gpus 0,1`.
+
+5. Hyper-parameter tuning: override any option at the command line. For example, to explore a longer curriculum with a higher learning rate:
+
+   ```bash
+   python3 main.py --cfgs configs/base.yaml configs/cifar10.yaml \
+       --max-round 7 --max-epoch 240 --base-lr 0.05 --batch-size 256
+   ```
+
+   All overrides are logged to `sessions/<timestamp>/config.yaml` for future reference.
+
+6. Visualise clustering progress live in TensorBoard by enabling TensorBoard logging (already `True` in `configs/base.yaml`) and running:
+
+   ```bash
+   # in a separate terminal
+   tensorboard --logdir sessions --port 6006
+   ```
+
+   Visit `http://localhost:6006` to monitor metrics such as AN statistics, loss curves, and evaluation accuracy while training is running.
+
+7. Run on CUDA with manual setup (optional): if you have multiple CUDA toolkits installed, you can control visibility by prefixing the command: `CUDA_VISIBLE_DEVICES=0 python3 main.py ...`. Combine this with `--gpus 0` to ensure PyTorch only initialises the desired devices.
 
 Every time the `main.py` is run, a new session will be started with the name of current timestamp and all the related files will be stored in folder `sessions/timestamp/` including checkpoints, logs, etc.
 
