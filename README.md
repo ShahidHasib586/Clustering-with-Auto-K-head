@@ -22,7 +22,7 @@ The proposed AND model was evaluated on four object image classification dataset
 
 Python 3.10 or newer and PyTorch 2.4 (or any later 2.x release tested against this project) are required. Please refer to `requirements.yaml` for the full Conda environment specification. The Conda environment we used for the experiments can also be rebuilt according to it.
 
-#### Install with Conda (recommended)
+#### Install with Conda (not recommended)
 
 ```bash
 
@@ -84,6 +84,9 @@ pip install jinja2 typeguard
 #### Install with pip (minimal)
 
 ```bash
+python3 main.py --cfgs configs/base.yaml configs/cifar10.yaml \
+  --sess-dir sessions --dataset cifar10 --network ResNet18
+
 python3 -m venv .venv
 source .venv/bin/activate
 pip install --upgrade pip
@@ -105,8 +108,9 @@ pip install numpy scipy scikit-learn scikit-image pillow matplotlib \
 2. Launch training via the session runner to automatically manage checkpoints and logs:
 
    ```bash
-   python3 main.py --cfgs configs/base.yaml configs/cifar10.yaml \
-       --sess-dir sessions --dataset cifar10 --network resnet18
+    python3 main.py --cfgs configs/base.yaml configs/cifar10.yaml \
+    --sess-dir sessions --dataset cifar10 --network ResNet18
+
    ```
 
    This command reproduces the reported ResNet18 result on CIFAR10. Checkpoints, TensorBoard logs and configuration snapshots are written under `sessions/<timestamp>/`.
