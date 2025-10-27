@@ -25,6 +25,32 @@ Python 3.10 or newer and PyTorch 2.4 (or any later 2.x release tested against th
 #### Install with Conda (recommended)
 
 ```bash
+
+# set up the environment
+# From home dir
+cd ~
+
+# install micromamba (single binary, no sudo)
+curl -Ls https://micro.mamba.pm/api/micromamba/linux-64/latest | tar -xvj bin/micromamba
+
+# Initialize for bash (use -r, not -p)
+export MAMBA_ROOT_PREFIX="$HOME/micromamba"
+./bin/micromamba shell init -s bash -r "$MAMBA_ROOT_PREFIX"
+
+# Reload your shell so "micromamba" is on PATH
+exec $SHELL -l
+# (If it still says command not found: source ~/.bashrc)
+
+# Create & activate a Python 3.10 env
+micromamba create -y -n and310 python=3.10
+micromamba activate and310
+
+# install torch/vision/audio first (CUDA 11.3 builds)
+pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 torchaudio==0.12.1+cu113 \
+  -f https://download.pytorch.org/whl/torch_stable.html
+
+
+
 # clone the repository
 git clone https://github.com/ShahidHasib586/Clustering-with-Auto-K-head.git
 cd Clustering-with-Auto-K-head
