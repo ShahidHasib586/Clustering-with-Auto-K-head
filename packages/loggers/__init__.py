@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # @Date    : 2019-01-24 23:26:16
 # @Author  : Raymond Wong (jiabo.huang@qmul.ac.uk)
@@ -16,7 +16,7 @@ def require_args():
         parser {argparse} -- current version of argparse object
     """
     if not REGISTER.is_package_registered(__name__):
-        return parser
+        return None
 
     classes = REGISTER.get_classes(__name__)
 
