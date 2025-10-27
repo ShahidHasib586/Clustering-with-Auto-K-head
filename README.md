@@ -28,10 +28,15 @@ Python 3.9 and PyTorch 1.10 are required. Please refer to `requirements.yaml` fo
 # clone the repository
 git clone https://github.com/Raymond-sci/AND.git
 cd AND
+# use plain venv
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -U pip wheel
+pip install -r requirements.txt
 
 # create the environment described in requirements.yaml
-conda env create -f requirements.yaml
-conda activate and-env
+#conda env create -f requirements.yaml
+#conda activate and-env
 ```
 
 #### Install with pip (minimal)
